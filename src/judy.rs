@@ -1,9 +1,8 @@
-#![feature(libc)]
-//#[link_args="-lJudy"];
+extern crate libc;
 
 use self::capi::*;
 use std::mem::size_of;
-use std::mem::transmute;
+use std::mem::{transmute, transmute_copy};
 use std::ptr::null_mut;
 use std::marker::PhantomData;
 
@@ -74,7 +73,7 @@ pub mod capi {
     }
 }
 
-struct JudyL<V> {
+pub struct JudyL<V> {
     m: Pvoid_t,
     value_type: PhantomData<V>,
 }
@@ -130,7 +129,7 @@ impl<V> JudyL<V> {
     }
 }
 
-struct JudyHS<K, V> {
+pub struct JudyHS<K, V> {
     m: Pvoid_t,
     key_type: PhantomData<K>,
     value_type: PhantomData<V>,
@@ -179,7 +178,7 @@ impl<K, V> JudyHS<K, V> {
 
 }
 
-//#[deriving(Clone)]
+#[derive(Clone)]
 struct JudyLIterator<V> {
     m: Pcvoid_t,
     i: Word_t,
@@ -195,8 +194,8 @@ impl<V> Iterator for JudyLIterator<V> {
             if v == null_mut() {
                 None
             } else {
-                //Some((self.i, transmute(*v)))
-                None
+                let vv = *v as *mut V;
+                Some((self.i, transmute_copy(&*vv)))
             }
         }
     }
@@ -228,26 +227,29 @@ mod tests {
 
     #[test]
     fn test_JudyHS() {
-        let mut h = JudyHS::<int, int>::new();
-        assert!(h.insert(123, ~456));
+        let mut h = JudyHS::<u32, u32>::new();
+        assert!(h.insert(123, &456));
         match h.get(123) {
             Some(x) => assert_eq!(456, *x),
-            None => fail!(),
+            None => panic!(),
         }
         assert!(h.free() > 0);
     }
 
     #[test]
     fn test_JudyL() {
-        let mut h = JudyL::<int>::new();
-        assert!(h.insert(123, ~456));
+        let mut h = JudyL::<u32>::new();
+        assert!(h.insert(123, &456));
         match h.get(123) {
             Some(x) => assert_eq!(456, *x),
-            None => fail!(),
+            None => panic!(),
         }
 
+        let mut it = h.iter();
+        assert_eq!(Some((123, 456)), it.next());
+        assert_eq!(None, it.next());
         for (i, v) in h.iter() {
-            debug2!("i: {:?} v: {:?}", i, v);
+            println!("i: {:?} v: {:?}", i, v);
         }
         assert!(h.free() > 0);
     }

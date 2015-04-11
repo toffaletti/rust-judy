@@ -1,4 +1,6 @@
-#[link(name="Judy", kind="static")]
+#[link(name="Judy")]
+extern {}
+
 mod judy;
 
 #[test]

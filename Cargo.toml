@@ -2,3 +2,6 @@
 name = "judy"
 version = "0.0.1"
 authors = ["Jason Toffaletti <toffaletti@gmail.com>"]
+
+[dependencies]
+libc = "0.1.6"
