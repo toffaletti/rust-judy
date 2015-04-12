@@ -6,10 +6,10 @@ use judy::JudyHS;
 
 #[test]
 fn test_judyhs() {
-    let mut h = JudyHS::<u32, u32>::new();
-    assert!(h.insert(123, &456));
-    match h.get(123) {
-        Some(x) => assert_eq!(456, *x),
+    let mut h = JudyHS::new();
+    assert!(h.insert("123", 456));
+    match h.get("123") {
+        Some(x) => assert_eq!(456, x),
         None => panic!(),
     }
     assert!(h.free() > 0);
@@ -17,10 +17,10 @@ fn test_judyhs() {
 
 #[test]
 fn test_judyl() {
-    let mut h = JudyL::<u32>::new();
-    assert!(h.insert(123, &456));
+    let mut h = JudyL::new();
+    assert!(h.insert(123, 456));
     match h.get(123) {
-        Some(x) => assert_eq!(456, *x),
+        Some(x) => assert_eq!(456, x),
         None => panic!(),
     }
 

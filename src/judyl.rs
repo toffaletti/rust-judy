@@ -1,19 +1,16 @@
 use super::capi::*;
 use std::ptr::null_mut;
-use std::marker::PhantomData;
-use std::mem::{transmute, transmute_copy};
 
-pub struct JudyL<V> {
+pub struct JudyL {
     m: Pvoid_t,
-    value_type: PhantomData<V>,
 }
 
-impl<V> JudyL<V> {
-    pub fn new() -> JudyL<V> {
-        JudyL{m: null_mut(), value_type: PhantomData}
+impl JudyL {
+    pub fn new() -> JudyL {
+        JudyL{m: null_mut()}
     }
 
-    pub fn insert(&mut self, index: Word_t, value: &V) -> bool {
+    pub fn insert(&mut self, index: Word_t, value: Word_t) -> bool {
         unsafe {
             let v = JudyLIns(&mut self.m, index, null_mut());
             if v == null_mut() {
@@ -21,19 +18,19 @@ impl<V> JudyL<V> {
             } else if *v != null_mut() {
                 false
             } else {
-                *v = transmute(value);
+                *v = value as Pvoid_t;
                 true
             }
         }
     }
 
-    pub fn get<'a>(&'a self, index: Word_t) -> Option<&'a V> {
+    pub fn get(&self, index: Word_t) -> Option<Word_t> {
         unsafe {
             let v = JudyLGet(self.m, index, null_mut());
             if v == null_mut() {
                 None
             } else {
-                Some(transmute(*v))
+                Some(*v as Word_t)
             }
         }
     }
@@ -50,8 +47,8 @@ impl<V> JudyL<V> {
         }
     }
 
-    pub fn iter(& self) -> JudyLIterator<V> {
-        JudyLIterator{ m: self.m, i: 0, value_type: PhantomData}
+    pub fn iter(& self) -> JudyLIterator {
+        JudyLIterator{ m: self.m, i: 0}
     }
 
     pub fn count(&self, index1: Word_t, index2: Word_t) -> Word_t {
@@ -62,29 +59,27 @@ impl<V> JudyL<V> {
 }
 
 #[derive(Clone)]
-pub struct JudyLIterator<V> {
+pub struct JudyLIterator {
     m: Pcvoid_t,
     i: Word_t,
-    value_type: PhantomData<V>,
 }
 
-impl<V> Iterator for JudyLIterator<V> {
-    type Item = (Word_t, V);
+impl Iterator for JudyLIterator {
+    type Item = (Word_t, Word_t);
 
-    fn next(&mut self) -> Option<(Word_t, V)> {
+    fn next(&mut self) -> Option<(Word_t, Word_t)> {
         unsafe {
             let v = JudyLNext(self.m, &mut self.i, null_mut());
             if v == null_mut() {
                 None
             } else {
-                let vv = *v as *mut V;
-                Some((self.i, transmute_copy(&*vv)))
+                Some((self.i, *v as Word_t))
             }
         }
     }
 }
 
-impl<V> Drop for JudyL<V> {
+impl Drop for JudyL {
     fn drop(&mut self) {
         self.free();
     }
