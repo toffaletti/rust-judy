@@ -1,8 +1,7 @@
 #[link(name="Judy")]
 extern {}
 
-mod judy;
+pub mod judy;
 
-#[test]
-fn it_works() {
-}
+pub use judy::JudyL;
+pub use judy::JudyHS;

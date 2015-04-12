@@ -7,6 +7,9 @@ use std::ptr::null_mut;
 use std::marker::PhantomData;
 
 pub mod capi {
+    #![allow(non_camel_case_types)]
+    #![allow(non_snake_case)]
+
     extern crate libc;
     use self::libc::{c_void, c_int, c_ulong};
     pub type Pvoid_t = *mut c_void;
@@ -32,6 +35,7 @@ pub mod capi {
     pub static JU_ERRNO_OVERRUN: JU_Errno_t        = 8;
     pub static JU_ERRNO_CORRUPT: JU_Errno_t        = 9;
 
+    #[repr(C)]
     pub struct JError_t {
         je_Errno: JU_Errno_t,
         je_ErrID: c_int,
@@ -79,11 +83,11 @@ pub struct JudyL<V> {
 }
 
 impl<V> JudyL<V> {
-    fn new() -> JudyL<V> {
+    pub fn new() -> JudyL<V> {
         JudyL{m: null_mut(), value_type: PhantomData}
     }
 
-    fn insert(&mut self, index: Word_t, value: &V) -> bool {
+    pub fn insert(&mut self, index: Word_t, value: &V) -> bool {
         unsafe {
             let v = JudyLIns(&mut self.m, index, null_mut());
             if v == null_mut() {
@@ -97,7 +101,7 @@ impl<V> JudyL<V> {
         }
     }
 
-    fn get<'a>(&'a self, index: Word_t) -> Option<&'a V> {
+    pub fn get<'a>(&'a self, index: Word_t) -> Option<&'a V> {
         unsafe {
             let v = JudyLGet(self.m as Pcvoid_t, index, null_mut());
             if v == null_mut() {
@@ -108,21 +112,23 @@ impl<V> JudyL<V> {
         }
     }
 
-    fn free(&mut self) -> Word_t {
+    pub fn free(&mut self) -> Word_t {
         if self.m != null_mut() {
             unsafe {
-                JudyLFreeArray(&mut self.m, null_mut())
+                let ret = JudyLFreeArray(&mut self.m, null_mut());
+                assert!(self.m == null_mut());
+                ret
             }
         } else {
             0
         }
     }
 
-    fn iter(& self) -> JudyLIterator<V> {
+    pub fn iter(& self) -> JudyLIterator<V> {
         JudyLIterator{ m: self.m as Pcvoid_t, i: 0, value_type: PhantomData}
     }
 
-    fn count(&self, index1: Word_t, index2: Word_t) -> Word_t {
+    pub fn count(&self, index1: Word_t, index2: Word_t) -> Word_t {
         unsafe {
             JudyLCount(self.m as Pcvoid_t, index1, index2, null_mut())
         }
@@ -136,11 +142,11 @@ pub struct JudyHS<K, V> {
 }
 
 impl<K, V> JudyHS<K, V> {
-    fn new() -> JudyHS<K, V> {
+    pub fn new() -> JudyHS<K, V> {
         JudyHS{m: null_mut(), key_type: PhantomData, value_type: PhantomData}
     }
 
-    fn insert(&mut self, key: K, value: &V) -> bool {
+    pub fn insert(&mut self, key: K, value: &V) -> bool {
         unsafe {
             let kk = &key as *const K;
             let v = JudyHSIns(&mut self.m, kk as Pcvoid_t, size_of::<K>() as Word_t, null_mut());
@@ -155,7 +161,7 @@ impl<K, V> JudyHS<K, V> {
         }
     }
 
-    fn get<'a>(&'a self, key: K) -> Option<&'a V> {
+    pub fn get<'a>(&'a self, key: K) -> Option<&'a V> {
         unsafe {
             let kk = &key as *const K;
             let v = JudyHSGet(self.m as Pcvoid_t, kk as Pcvoid_t, size_of::<K>() as Word_t);
@@ -167,19 +173,19 @@ impl<K, V> JudyHS<K, V> {
         }
     }
 
-    fn free(&mut self) -> Word_t {
+    pub fn free(&mut self) -> Word_t {
         if self.m != null_mut() {
-            unsafe { JudyHSFreeArray(&mut self.m, null_mut()) }
-            //assert!(self.m == null_mut());
+            let ret = unsafe { JudyHSFreeArray(&mut self.m, null_mut()) };
+            assert!(self.m == null_mut());
+            ret
         } else {
             0
         }
     }
-
 }
 
 #[derive(Clone)]
-struct JudyLIterator<V> {
+pub struct JudyLIterator<V> {
     m: Pcvoid_t,
     i: Word_t,
     value_type: PhantomData<V>,
@@ -201,7 +207,21 @@ impl<V> Iterator for JudyLIterator<V> {
     }
 }
 
+impl<V> Drop for JudyL<V> {
+    fn drop(&mut self) {
+        self.free();
+    }
+}
+
+impl<K, V> Drop for JudyHS<K, V> {
+    fn drop(&mut self) {
+        self.free();
+    }
+}
+
 //impl<V> RandomAccessIterator<(Word_t, V)> for JudyLIterator<V> {
+//    type Item = (Word_t, V);
+//
 //    fn indexable(&self) -> usize {
 //        unsafe {
 //            JudyLCount(self.m, 0, -1, null_mut()) as usize
@@ -215,7 +235,9 @@ impl<V> Iterator for JudyLIterator<V> {
 //            if v == null_mut() {
 //                None
 //            } else {
-//                Some((index as Word_t, transmute(*v)))
+//                let vv = *v as *mut V;
+//                Some((self.i, transmute_copy(&*vv)))
+//
 //            }
 //        }
 //    }
@@ -226,7 +248,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_JudyHS() {
+    fn test_judyhs() {
         let mut h = JudyHS::<u32, u32>::new();
         assert!(h.insert(123, &456));
         match h.get(123) {
@@ -237,7 +259,7 @@ mod tests {
     }
 
     #[test]
-    fn test_JudyL() {
+    fn test_judyl() {
         let mut h = JudyL::<u32>::new();
         assert!(h.insert(123, &456));
         match h.get(123) {
