@@ -82,4 +82,13 @@ extern {
     pub fn Judy1NextEmpty(array: Pcvoid_t, pindex: *mut Word_t, err: PJError_t) -> c_int;
     pub fn Judy1LastEmpty(array: Pcvoid_t, pindex: *mut Word_t, err: PJError_t) -> c_int;
     pub fn Judy1PrevEmpty(array: Pcvoid_t, pindex: *mut Word_t, err: PJError_t) -> c_int;
+
+    pub fn JudySLGet(array: Pcvoid_t, index: *const u8) -> PPvoid_t;
+    pub fn JudySLIns(array: PPvoid_t, index: *const u8, err: PJError_t) -> PPvoid_t;
+    pub fn JudySLDel(array: PPvoid_t, index: *const u8, err: PJError_t) -> c_int;
+    pub fn JudySLFreeArray(array: PPvoid_t, err: PJError_t) -> Word_t;
+    pub fn JudySLFirst(array: Pcvoid_t, pindex: *mut u8, err: PJError_t) -> PPvoid_t;
+    pub fn JudySLNext(array: Pcvoid_t, pindex: *mut u8, err: PJError_t) -> PPvoid_t;
+    pub fn JudySLLast(array: Pcvoid_t, pindex: *mut u8, err: PJError_t) -> PPvoid_t;
+    pub fn JudySLPrev(array: Pcvoid_t, pindex: *mut u8, err: PJError_t) -> PPvoid_t;
 }

@@ -36,23 +36,22 @@ impl Judy1 {
         }
     }
 
-    pub fn iter(& self) -> Judy1Iterator {
-        Judy1Iterator{m: self.m, i: 0}
+    pub fn iter<'a>(&'a self) -> Judy1Iterator<'a> {
+        Judy1Iterator{j: self, i: 0}
     }
 }
 
-#[derive(Clone)]
-pub struct Judy1Iterator {
-    m: Pcvoid_t,
+pub struct Judy1Iterator<'a> {
+    j: &'a Judy1,
     i: Word_t,
 }
 
-impl Iterator for Judy1Iterator {
+impl<'a> Iterator for Judy1Iterator<'a> {
     type Item = Word_t;
 
     fn next(&mut self) -> Option<(Word_t)> {
         unsafe {
-            let v = Judy1Next(self.m, &mut self.i, null_mut());
+            let v = Judy1Next(self.j.m, &mut self.i, null_mut());
             if v == 0 {
                 None
             } else {

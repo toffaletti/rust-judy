@@ -2,7 +2,30 @@ extern crate judy;
 
 use judy::Judy1;
 use judy::JudyL;
+use judy::JudySL;
 use judy::JudyHS;
+
+#[test]
+fn test_judysl() {
+    let mut h = JudySL::new();
+    assert!(h.insert("a", 1));
+    match h.get("a") {
+        Some(x) => assert_eq!(1, x),
+        None => panic!(),
+    }
+    assert!(h.insert("b", 1));
+    {
+        let mut it = h.iter();
+        let (k, v) = it.next().unwrap();
+        assert_eq!("a", std::str::from_utf8(k.to_bytes()).unwrap());
+        assert_eq!(1, v);
+
+        let (k, v) = it.next().unwrap();
+        assert_eq!("b", std::str::from_utf8(k.to_bytes()).unwrap());
+        assert_eq!(1, v);
+    }
+    assert!(h.free() > 0);
+}
 
 #[test]
 fn test_judyhs() {
@@ -24,11 +47,13 @@ fn test_judyl() {
         None => panic!(),
     }
 
-    let mut it = h.iter();
-    assert_eq!(Some((123, 456)), it.next());
-    assert_eq!(None, it.next());
-    for (i, v) in h.iter() {
-        println!("i: {:?} v: {:?}", i, v);
+    {
+        let mut it = h.iter();
+        assert_eq!(Some((123, 456)), it.next());
+        assert_eq!(None, it.next());
+        for (i, v) in h.iter() {
+            println!("i: {:?} v: {:?}", i, v);
+        }
     }
     assert!(h.free() > 0);
 }
@@ -48,10 +73,12 @@ fn test_judy1() {
     assert_eq!(true, h.set(123));
     assert_eq!(true, h.set(456));
 
-    let mut it = h.iter();
-    assert_eq!(Some(123), it.next());
-    assert_eq!(Some(456), it.next());
-    assert_eq!(None, it.next());
+    {
+        let mut it = h.iter();
+        assert_eq!(Some(123), it.next());
+        assert_eq!(Some(456), it.next());
+        assert_eq!(None, it.next());
+    }
 
     assert!(h.free() > 0);
     assert_eq!(0, h.free());

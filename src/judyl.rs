@@ -47,8 +47,8 @@ impl JudyL {
         }
     }
 
-    pub fn iter(& self) -> JudyLIterator {
-        JudyLIterator{ m: self.m, i: 0}
+    pub fn iter<'a>(&'a self) -> JudyLIterator<'a> {
+        JudyLIterator{j: self, i: 0}
     }
 
     pub fn count(&self, index1: Word_t, index2: Word_t) -> Word_t {
@@ -58,18 +58,17 @@ impl JudyL {
     }
 }
 
-#[derive(Clone)]
-pub struct JudyLIterator {
-    m: Pcvoid_t,
+pub struct JudyLIterator<'a> {
+    j: &'a JudyL,
     i: Word_t,
 }
 
-impl Iterator for JudyLIterator {
+impl<'a> Iterator for JudyLIterator<'a> {
     type Item = (Word_t, Word_t);
 
     fn next(&mut self) -> Option<(Word_t, Word_t)> {
         unsafe {
-            let v = JudyLNext(self.m, &mut self.i, null_mut());
+            let v = JudyLNext(self.j.m, &mut self.i, null_mut());
             if v == null_mut() {
                 None
             } else {
