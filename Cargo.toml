@@ -2,6 +2,20 @@
 name = "judy"
 version = "0.0.1"
 authors = ["Jason Toffaletti <toffaletti@gmail.com>"]
+description = "Rust bindings for Judy http://judy.sourceforge.net"
+license = "Apache-2.0"
+repository = "https://github.com/toffaletti/rust-judy.git"
+readme = "README.md"
+
+include = [
+    "src/*.rs",
+    "test/*.rs",
+    "Cargo.toml",
+    "README.md",
+]
 
 [dependencies]
 libc = "0.1.6"
+
+[lib]
+name = "judy"

@@ -1,7 +1,11 @@
 #[link(name="Judy")]
 extern {}
 
-pub mod judy;
+mod capi;
+mod judy1;
+mod judyl;
+mod judyhs;
 
-pub use judy::JudyL;
-pub use judy::JudyHS;
+pub use self::judy1::Judy1;
+pub use self::judyl::JudyL;
+pub use self::judyhs::JudyHS;
