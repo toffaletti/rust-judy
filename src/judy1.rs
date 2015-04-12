@@ -35,6 +35,37 @@ impl Judy1 {
             0
         }
     }
+
+    pub fn iter(& self) -> Judy1Iterator {
+        Judy1Iterator{m: self.m, i: 0}
+    }
+}
+
+#[derive(Clone)]
+pub struct Judy1Iterator {
+    m: Pcvoid_t,
+    i: Word_t,
+}
+
+impl Iterator for Judy1Iterator {
+    type Item = Word_t;
+
+    fn next(&mut self) -> Option<(Word_t)> {
+        unsafe {
+            let v = Judy1Next(self.m, &mut self.i, null_mut());
+            if v == 0 {
+                None
+            } else {
+                Some(self.i)
+            }
+        }
+    }
+}
+
+impl Drop for Judy1 {
+    fn drop(&mut self) {
+        self.free();
+    }
 }
 
 

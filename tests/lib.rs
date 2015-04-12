@@ -46,6 +46,13 @@ fn test_judy1() {
     assert_eq!(false , h.unset(123));
 
     assert_eq!(true, h.set(123));
+    assert_eq!(true, h.set(456));
+
+    let mut it = h.iter();
+    assert_eq!(Some(123), it.next());
+    assert_eq!(Some(456), it.next());
+    assert_eq!(None, it.next());
+
     assert!(h.free() > 0);
     assert_eq!(0, h.free());
 }
