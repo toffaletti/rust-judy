@@ -39,6 +39,15 @@ impl<K :Into<Vec<u8>>> JudyHS<K> {
         }
     }
 
+    pub fn remove(&mut self, key: K) -> bool {
+        // TODO: couldn't find a good way to take a &K
+        // shouldn't need to consume key
+        unsafe {
+            let ks = key.into();
+            1 == JudyHSDel(&mut self.m, ks.as_ptr() as Pcvoid_t, ks.len() as Word_t, null_mut())
+        }
+    }
+
     pub fn free(&mut self) -> Word_t {
         if self.m != null_mut() {
             let ret = unsafe { JudyHSFreeArray(&mut self.m, null_mut()) };
@@ -47,6 +56,14 @@ impl<K :Into<Vec<u8>>> JudyHS<K> {
         } else {
             0
         }
+    }
+
+    pub fn clear(&mut self) {
+        self.free();
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.m == null_mut()
     }
 }
 

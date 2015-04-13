@@ -56,6 +56,22 @@ impl JudyL {
             JudyLCount(self.m, index1, index2, null_mut())
         }
     }
+
+    pub fn remove(&mut self, index: &Word_t) -> bool {
+        1 == unsafe { JudyLDel(&mut self.m, *index, null_mut()) }
+    }
+
+    pub fn clear(&mut self) {
+        self.free();
+    }
+
+    pub fn len(&self) -> usize {
+        self.count(0, Word_t::max_value()) as usize
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.m == null_mut()
+    }
 }
 
 pub struct JudyLIterator<'a> {

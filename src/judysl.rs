@@ -39,6 +39,13 @@ impl JudySL {
         }
     }
 
+    pub fn remove(&mut self, key: &str) -> bool {
+        unsafe {
+            let ks = CString::from_vec_unchecked(key.into());
+            1 == JudySLDel(&mut self.m, ks.as_ptr() as *const u8, null_mut())
+        }
+    }
+
     pub fn free(&mut self) -> Word_t {
         if self.m != null_mut() {
             let ret = unsafe { JudySLFreeArray(&mut self.m, null_mut()) };
@@ -51,6 +58,14 @@ impl JudySL {
 
     pub fn iter<'a>(&'a self) -> JudySLIterator<'a> {
         JudySLIterator{ sl: self, k: [0; 1024]}
+    }
+
+    pub fn clear(&mut self) {
+        self.free();
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.m == null_mut()
     }
 }
 

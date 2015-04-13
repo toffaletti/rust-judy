@@ -39,6 +39,24 @@ impl Judy1 {
     pub fn iter<'a>(&'a self) -> Judy1Iterator<'a> {
         Judy1Iterator{j: self, i: 0}
     }
+
+    pub fn count(&self, index1: Word_t, index2: Word_t) -> Word_t {
+        unsafe {
+            Judy1Count(self.m, index1, index2, null_mut())
+        }
+    }
+
+    pub fn clear(&mut self) {
+        self.free();
+    }
+
+    pub fn len(&self) -> usize {
+        self.count(0, Word_t::max_value()) as usize
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.m == null_mut()
+    }
 }
 
 pub struct Judy1Iterator<'a> {

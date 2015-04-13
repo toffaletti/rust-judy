@@ -13,6 +13,7 @@ fn test_judysl() {
         Some(x) => assert_eq!(1, x),
         None => panic!(),
     }
+    assert_eq!(None, h.get("b"));
     assert!(h.insert("b", 1));
     {
         let mut it = h.iter();
@@ -24,7 +25,9 @@ fn test_judysl() {
         assert_eq!("b", std::str::from_utf8(k.to_bytes()).unwrap());
         assert_eq!(1, v);
     }
+    assert!(h.remove("b"));
     assert!(h.free() > 0);
+    assert!(h.is_empty());
 }
 
 #[test]
@@ -35,12 +38,16 @@ fn test_judyhs() {
         Some(x) => assert_eq!(456, x),
         None => panic!(),
     }
+    assert!(h.insert("456", 789));
+    assert!(h.remove("456"));
     assert!(h.free() > 0);
+    assert!(h.is_empty());
 }
 
 #[test]
 fn test_judyl() {
     let mut h = JudyL::new();
+    assert!(h.is_empty());
     assert!(h.insert(123, 456));
     match h.get(123) {
         Some(x) => assert_eq!(456, x),
@@ -55,12 +62,16 @@ fn test_judyl() {
             println!("i: {:?} v: {:?}", i, v);
         }
     }
+    assert!(h.insert(456, 1));
+    assert_eq!(2, h.len());
+    assert!(h.remove(&456));
     assert!(h.free() > 0);
 }
 
 #[test]
 fn test_judy1() {
     let mut h = Judy1::new();
+    assert!(h.is_empty());
     assert_eq!(true, h.set(123));
     assert_eq!(false, h.set(123));
 
@@ -73,6 +84,7 @@ fn test_judy1() {
     assert_eq!(true, h.set(123));
     assert_eq!(true, h.set(456));
 
+    assert_eq!(2, h.len());
     {
         let mut it = h.iter();
         assert_eq!(Some(123), it.next());
@@ -82,4 +94,5 @@ fn test_judy1() {
 
     assert!(h.free() > 0);
     assert_eq!(0, h.free());
+    assert!(h.is_empty());
 }
