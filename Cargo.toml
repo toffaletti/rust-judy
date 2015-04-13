@@ -1,6 +1,6 @@
 [package]
 name = "judy"
-version = "0.0.1"
+version = "0.0.2"
 authors = ["Jason Toffaletti <toffaletti@gmail.com>"]
 description = "Rust bindings for Judy http://judy.sourceforge.net"
 license = "Apache-2.0"
