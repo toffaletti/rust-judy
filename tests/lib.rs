@@ -58,9 +58,6 @@ fn test_judyl() {
         let mut it = h.iter();
         assert_eq!(Some((123, 456)), it.next());
         assert_eq!(None, it.next());
-        for (i, v) in h.iter() {
-            println!("i: {:?} v: {:?}", i, v);
-        }
     }
     assert!(h.insert(456, 1));
     assert_eq!(2, h.len());

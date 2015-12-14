@@ -1,6 +1,7 @@
 use super::capi::*;
 use std::ptr::null_mut;
 use std::marker::PhantomData;
+use std::mem::size_of;
 
 pub struct JudyHS<K :Into<Vec<u8>>> {
     m: Pvoid_t,
@@ -65,6 +66,34 @@ impl<K :Into<Vec<u8>>> JudyHS<K> {
     pub fn is_empty(&self) -> bool {
         self.m == null_mut()
     }
+
+    pub fn iter<'a>(&'a self) -> JudyHSIterator<'a, K> {
+        JudyHSIterator{j: self, len: 0}
+    }
+}
+
+pub struct JudyHSIterator<'a, K:'a> where K: Into<Vec<u8>> {
+    j: &'a JudyHS<K>,
+    len: Word_t,
+}
+
+impl<'a, K: Into<Vec<u8>>> Iterator for JudyHSIterator<'a, K> {
+    type Item = (Word_t, Word_t);
+
+    fn next(&mut self) -> Option<(Word_t, Word_t)> {
+        unsafe {
+            let v = JudyLNext(self.j.m, &mut self.len, null_mut());
+            if v == null_mut() {
+                None
+            } else {
+                if self.len as usize > size_of::<Word_t>() {
+                    // TODO
+                } else {
+                }
+                Some((self.len, *v as Word_t))
+            }
+        }
+    }
 }
 
 impl<K :Into<Vec<u8>>> Drop for JudyHS<K> {
@@ -72,5 +101,4 @@ impl<K :Into<Vec<u8>>> Drop for JudyHS<K> {
         self.free();
     }
 }
-
 
