@@ -32,16 +32,44 @@ fn test_judysl() {
 
 #[test]
 fn test_judyhs() {
-    let mut h = JudyHS::new();
-    assert!(h.insert("123", 456));
-    match h.get("123") {
-        Some(x) => assert_eq!(456, x),
-        None => panic!(),
+    {
+        let mut h = JudyHS::new();
+        assert!(h.insert("123", 456));
+        match h.get("123") {
+            Some(x) => assert_eq!(456, x),
+            None => panic!(),
+        }
+        assert!(h.insert("456", 789));
+        assert!(h.remove("456"));
+        assert!(h.free() > 0);
+        assert!(h.is_empty());
     }
-    assert!(h.insert("456", 789));
-    assert!(h.remove("456"));
-    assert!(h.free() > 0);
-    assert!(h.is_empty());
+
+    {
+        let mut h = JudyHS::new();
+        assert!(h.insert(&123, 456));
+        match h.get(&123) {
+            Some(x) => assert_eq!(456, x),
+            None => panic!(),
+        }
+        assert!(h.insert(&456, 789));
+        assert!(h.remove(&456));
+        assert!(h.free() > 0);
+        assert!(h.is_empty());
+    }
+
+    {
+        let mut h = JudyHS::new();
+        assert!(h.insert("123".as_bytes(), 456));
+        match h.get("123".as_bytes()) {
+            Some(x) => assert_eq!(456, x),
+            None => panic!(),
+        }
+        assert!(h.insert("456".as_bytes(), 789));
+        assert!(h.remove("456".as_bytes()));
+        assert!(h.free() > 0);
+        assert!(h.is_empty());
+    }
 }
 
 #[test]
