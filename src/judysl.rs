@@ -1,7 +1,7 @@
 use super::capi::*;
-use std::ptr::null_mut;
 use std::ffi::CStr;
 use std::ffi::CString;
+use std::ptr::null_mut;
 
 pub struct JudySL {
     m: Pvoid_t,
@@ -9,7 +9,7 @@ pub struct JudySL {
 
 impl JudySL {
     pub fn new() -> JudySL {
-        JudySL{m: null_mut()}
+        JudySL { m: null_mut() }
     }
 
     pub fn insert(&mut self, key: &str, value: Word_t) -> bool {
@@ -57,7 +57,10 @@ impl JudySL {
     }
 
     pub fn iter<'a>(&'a self) -> JudySLIterator<'a> {
-        JudySLIterator{ sl: self, k: [0; 1024]}
+        JudySLIterator {
+            sl: self,
+            k: [0; 1024],
+        }
     }
 
     pub fn clear(&mut self) {

@@ -1,7 +1,7 @@
 use super::capi::*;
-use std::ptr::null_mut;
 use std::marker::PhantomData;
 use std::mem::size_of;
+use std::ptr::null_mut;
 
 pub trait SizedPtr {
     fn len(&self) -> usize;
@@ -10,17 +10,17 @@ pub trait SizedPtr {
 
 impl SizedPtr for str {
     fn len(&self) -> usize {
-        return self.len()
+        return self.len();
     }
 
     fn as_ptr(&self) -> *const u8 {
-        return self.as_ptr()
+        return self.as_ptr();
     }
 }
 
 impl<K> SizedPtr for [K] {
     fn len(&self) -> usize {
-        return self.len()
+        return self.len();
     }
 
     fn as_ptr(&self) -> *const u8 {
@@ -38,14 +38,17 @@ impl<K> SizedPtr for K {
     }
 }
 
-pub struct JudyHS<K:?Sized> {
+pub struct JudyHS<K: ?Sized> {
     m: Pvoid_t,
     key_type: PhantomData<*const K>,
 }
 
-impl<K:?Sized > JudyHS<K>{
+impl<K: ?Sized> JudyHS<K> {
     pub fn new() -> JudyHS<K> {
-        JudyHS{m: null_mut(), key_type: PhantomData}
+        JudyHS {
+            m: null_mut(),
+            key_type: PhantomData,
+        }
     }
 
     pub fn free(&mut self) -> Word_t {
@@ -70,7 +73,12 @@ impl<K:?Sized > JudyHS<K>{
 impl<K: SizedPtr + ?Sized> JudyHS<K> {
     pub fn insert(&mut self, key: &K, value: Word_t) -> bool {
         unsafe {
-            let v = JudyHSIns(&mut self.m, key.as_ptr() as Pcvoid_t, key.len() as Word_t, null_mut());
+            let v = JudyHSIns(
+                &mut self.m,
+                key.as_ptr() as Pcvoid_t,
+                key.len() as Word_t,
+                null_mut(),
+            );
             if v == null_mut() {
                 false
             } else if *v != null_mut() {
@@ -97,12 +105,17 @@ impl<K: SizedPtr + ?Sized> JudyHS<K> {
         // TODO: couldn't find a good way to take a &K
         // shouldn't need to consume key
         unsafe {
-            1 == JudyHSDel(&mut self.m, key.as_ptr() as Pcvoid_t, key.len() as Word_t, null_mut())
+            1 == JudyHSDel(
+                &mut self.m,
+                key.as_ptr() as Pcvoid_t,
+                key.len() as Word_t,
+                null_mut(),
+            )
         }
     }
 }
 
-impl<K:?Sized> Drop for JudyHS<K> {
+impl<K: ?Sized> Drop for JudyHS<K> {
     fn drop(&mut self) {
         self.free();
     }

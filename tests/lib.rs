@@ -1,9 +1,9 @@
 extern crate judy;
 
 use judy::Judy1;
+use judy::JudyHS;
 use judy::JudyL;
 use judy::JudySL;
-use judy::JudyHS;
 
 #[test]
 fn test_judysl() {
@@ -107,7 +107,7 @@ fn test_judy1() {
     assert_eq!(false, h.test(456));
 
     assert_eq!(true, h.unset(123));
-    assert_eq!(false , h.unset(123));
+    assert_eq!(false, h.unset(123));
 
     assert_eq!(true, h.set(123));
     assert_eq!(true, h.set(456));

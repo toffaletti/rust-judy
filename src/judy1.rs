@@ -7,7 +7,7 @@ pub struct Judy1 {
 
 impl Judy1 {
     pub fn new() -> Judy1 {
-        Judy1{m: null_mut()}
+        Judy1 { m: null_mut() }
     }
 
     pub fn set(&mut self, index: Word_t) -> bool {
@@ -37,13 +37,11 @@ impl Judy1 {
     }
 
     pub fn iter<'a>(&'a self) -> Judy1Iterator<'a> {
-        Judy1Iterator{j: self, i: 0}
+        Judy1Iterator { j: self, i: 0 }
     }
 
     pub fn count(&self, index1: Word_t, index2: Word_t) -> Word_t {
-        unsafe {
-            Judy1Count(self.m, index1, index2, null_mut())
-        }
+        unsafe { Judy1Count(self.m, index1, index2, null_mut()) }
     }
 
     pub fn clear(&mut self) {
@@ -84,5 +82,3 @@ impl Drop for Judy1 {
         self.free();
     }
 }
-
-

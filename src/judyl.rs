@@ -7,7 +7,7 @@ pub struct JudyL {
 
 impl JudyL {
     pub fn new() -> JudyL {
-        JudyL{m: null_mut()}
+        JudyL { m: null_mut() }
     }
 
     pub fn insert(&mut self, index: Word_t, value: Word_t) -> bool {
@@ -48,13 +48,11 @@ impl JudyL {
     }
 
     pub fn iter<'a>(&'a self) -> JudyLIterator<'a> {
-        JudyLIterator{j: self, i: 0}
+        JudyLIterator { j: self, i: 0 }
     }
 
     pub fn count(&self, index1: Word_t, index2: Word_t) -> Word_t {
-        unsafe {
-            JudyLCount(self.m, index1, index2, null_mut())
-        }
+        unsafe { JudyLCount(self.m, index1, index2, null_mut()) }
     }
 
     pub fn remove(&mut self, index: &Word_t) -> bool {
