@@ -1,6 +1,6 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
-#![allow(dead_code)] 
+#![allow(dead_code)]
 
 extern crate libc;
 use self::libc::{c_void, c_int, c_ulong};

@@ -3,7 +3,7 @@ use std::ptr::null_mut;
 use std::marker::PhantomData;
 use std::mem::size_of;
 
-trait SizedPtr {
+pub trait SizedPtr {
     fn len(&self) -> usize;
     fn as_ptr(&self) -> *const u8;
 }
