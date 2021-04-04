@@ -13,6 +13,7 @@ impl JudyL {
     pub fn insert(&mut self, index: Word_t, value: Word_t) -> bool {
         unsafe {
             let v = JudyLIns(&mut self.m, index, null_mut());
+            #[allow(clippy::if_same_then_else)]
             if v == null_mut() {
                 false
             } else if *v != null_mut() {
@@ -22,6 +23,15 @@ impl JudyL {
                 true
             }
         }
+    }
+
+    pub fn insert_bulk_sorted(&mut self, count: Word_t, keys: &[Word_t], vals: &[Word_t]) -> bool {
+        assert!(keys.len() as u64 >= count && vals.len() as u64 >= count, "insertBulk: Array less than passed count!");
+        unsafe {
+            let result = JudyLInsArray(&mut self.m, count, keys.as_ptr(), vals.as_ptr(), null_mut());
+            result == 0 || result == 1
+        }
+
     }
 
     pub fn get(&self, index: Word_t) -> Option<Word_t> {
