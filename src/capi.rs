@@ -82,6 +82,12 @@ extern "C" {
     pub fn JudyLPrevEmpty(array: Pcvoid_t, pindex: *mut Word_t, err: PJError_t) -> c_int;
 
     pub fn Judy1Set(array: PPvoid_t, index: Word_t, err: PJError_t) -> c_int;
+    pub fn Judy1SetArray(
+        array: PPvoid_t,
+        count: Word_t,
+        keys: *const Word_t,
+        err: PJError_t,
+    ) -> c_int;
     pub fn Judy1Unset(array: PPvoid_t, index: Word_t, err: PJError_t) -> c_int;
     pub fn Judy1Test(array: Pcvoid_t, index: Word_t, err: PJError_t) -> c_int;
     pub fn Judy1Count(array: Pcvoid_t, index1: Word_t, index2: Word_t, err: PJError_t) -> Word_t;

@@ -21,6 +21,17 @@ impl Judy1 {
         prev == 1
     }
 
+    pub fn set_bulk_sorted(&mut self, count: Word_t, keys: &[Word_t]) -> bool {
+        assert!(
+            keys.len() as u64 >= count,
+            "Judy1::set_bulk_sorted: Keys array shorter than count argument!"
+        );
+        unsafe {
+            let result = Judy1SetArray(&mut self.m, count, keys.as_ptr(), null_mut());
+            result == 0 || result == 1
+        }
+    }
+
     pub fn unset(&mut self, index: Word_t) -> bool {
         let prev = unsafe { Judy1Unset(&mut self.m, index, null_mut()) };
         prev == 1
