@@ -53,6 +53,7 @@ extern "C" {
     pub fn JudyHSFreeArray(array: PPvoid_t, err: PJError_t) -> Word_t;
 
     pub fn JudyLIns(array: PPvoid_t, index: Word_t, err: PJError_t) -> PPvoid_t;
+    pub fn JudyLInsArray(array: PPvoid_t, count: Word_t, keys: *const Word_t, vals: *const Word_t, err: PJError_t) -> c_int;
     pub fn JudyLDel(array: PPvoid_t, index: Word_t, err: PJError_t) -> c_int;
     pub fn JudyLGet(array: Pcvoid_t, index: Word_t, err: PJError_t) -> PPvoid_t;
     pub fn JudyLCount(array: Pcvoid_t, index1: Word_t, index2: Word_t, err: PJError_t) -> Word_t;
