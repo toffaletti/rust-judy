@@ -28,6 +28,9 @@ impl JudyL {
         }
     }
 
+    /// Warning: This function requires the keys to be sorted in relation to data already in the array.
+    /// That means even if this set of keys is sorted, if it's out of sequence with the keys in
+    /// the array then the function will fail.
     pub fn insert_bulk_sorted(&mut self, count: Word_t, keys: &[Word_t], vals: &[Word_t]) -> bool {
         assert!(
             keys.len() as u64 >= count && vals.len() as u64 >= count,
