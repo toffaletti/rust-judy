@@ -5,6 +5,12 @@ pub struct Judy1 {
     m: Pvoid_t,
 }
 
+impl Default for Judy1 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Judy1 {
     pub fn new() -> Judy1 {
         Judy1 { m: null_mut() }
@@ -25,10 +31,10 @@ impl Judy1 {
     }
 
     pub fn free(&mut self) -> Word_t {
-        if self.m != null_mut() {
+        if self.m.is_null() {
             unsafe {
                 let ret = Judy1FreeArray(&mut self.m, null_mut());
-                assert!(self.m == null_mut());
+                assert!(self.m.is_null());
                 ret
             }
         } else {
@@ -36,7 +42,7 @@ impl Judy1 {
         }
     }
 
-    pub fn iter<'a>(&'a self) -> Judy1Iterator<'a> {
+    pub fn iter(&self) -> Judy1Iterator<'_> {
         Judy1Iterator { j: self, i: 0 }
     }
 
@@ -53,7 +59,7 @@ impl Judy1 {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.m == null_mut()
+        self.m.is_null()
     }
 }
 
@@ -65,7 +71,7 @@ pub struct Judy1Iterator<'a> {
 impl<'a> Iterator for Judy1Iterator<'a> {
     type Item = Word_t;
 
-    fn next(&mut self) -> Option<(Word_t)> {
+    fn next(&mut self) -> Option<Word_t> {
         unsafe {
             let v = Judy1Next(self.j.m, &mut self.i, null_mut());
             if v == 0 {
