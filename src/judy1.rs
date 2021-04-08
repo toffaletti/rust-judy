@@ -5,6 +5,12 @@ pub struct Judy1 {
     m: Pvoid_t,
 }
 
+impl Default for Judy1 {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Judy1 {
     pub fn new() -> Judy1 {
         Judy1 { m: null_mut() }
@@ -13,6 +19,20 @@ impl Judy1 {
     pub fn set(&mut self, index: Word_t) -> bool {
         let prev = unsafe { Judy1Set(&mut self.m, index, null_mut()) };
         prev == 1
+    }
+
+    /// Warning: This function requires the keys to be sorted in relation to data already in the array.
+    /// That means even if this set of keys is sorted, if it's out of sequence with the keys in
+    /// the array then the function will fail.
+    pub fn set_bulk_sorted(&mut self, count: Word_t, keys: &[Word_t]) -> bool {
+        assert!(
+            keys.len() as u64 >= count,
+            "Judy1::set_bulk_sorted: Keys array shorter than count argument!"
+        );
+        unsafe {
+            let result = Judy1SetArray(&mut self.m, count, keys.as_ptr(), null_mut());
+            result == 0 || result == 1
+        }
     }
 
     pub fn unset(&mut self, index: Word_t) -> bool {
@@ -25,10 +45,10 @@ impl Judy1 {
     }
 
     pub fn free(&mut self) -> Word_t {
-        if self.m != null_mut() {
+        if self.m.is_null() {
             unsafe {
                 let ret = Judy1FreeArray(&mut self.m, null_mut());
-                assert!(self.m == null_mut());
+                assert!(self.m.is_null());
                 ret
             }
         } else {
@@ -36,7 +56,7 @@ impl Judy1 {
         }
     }
 
-    pub fn iter<'a>(&'a self) -> Judy1Iterator<'a> {
+    pub fn iter(&self) -> Judy1Iterator<'_> {
         Judy1Iterator { j: self, i: 0 }
     }
 
@@ -53,7 +73,7 @@ impl Judy1 {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.m == null_mut()
+        self.m.is_null()
     }
 }
 
@@ -65,7 +85,7 @@ pub struct Judy1Iterator<'a> {
 impl<'a> Iterator for Judy1Iterator<'a> {
     type Item = Word_t;
 
-    fn next(&mut self) -> Option<(Word_t)> {
+    fn next(&mut self) -> Option<Word_t> {
         unsafe {
             let v = Judy1Next(self.j.m, &mut self.i, null_mut());
             if v == 0 {

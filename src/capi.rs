@@ -1,6 +1,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(dead_code)]
+#![allow(clippy::upper_case_acronyms)]
 
 extern crate libc;
 use self::libc::{c_int, c_ulong, c_void};
@@ -53,6 +54,13 @@ extern "C" {
     pub fn JudyHSFreeArray(array: PPvoid_t, err: PJError_t) -> Word_t;
 
     pub fn JudyLIns(array: PPvoid_t, index: Word_t, err: PJError_t) -> PPvoid_t;
+    pub fn JudyLInsArray(
+        array: PPvoid_t,
+        count: Word_t,
+        keys: *const Word_t,
+        vals: *const Word_t,
+        err: PJError_t,
+    ) -> c_int;
     pub fn JudyLDel(array: PPvoid_t, index: Word_t, err: PJError_t) -> c_int;
     pub fn JudyLGet(array: Pcvoid_t, index: Word_t, err: PJError_t) -> PPvoid_t;
     pub fn JudyLCount(array: Pcvoid_t, index1: Word_t, index2: Word_t, err: PJError_t) -> Word_t;
@@ -74,6 +82,12 @@ extern "C" {
     pub fn JudyLPrevEmpty(array: Pcvoid_t, pindex: *mut Word_t, err: PJError_t) -> c_int;
 
     pub fn Judy1Set(array: PPvoid_t, index: Word_t, err: PJError_t) -> c_int;
+    pub fn Judy1SetArray(
+        array: PPvoid_t,
+        count: Word_t,
+        keys: *const Word_t,
+        err: PJError_t,
+    ) -> c_int;
     pub fn Judy1Unset(array: PPvoid_t, index: Word_t, err: PJError_t) -> c_int;
     pub fn Judy1Test(array: Pcvoid_t, index: Word_t, err: PJError_t) -> c_int;
     pub fn Judy1Count(array: Pcvoid_t, index1: Word_t, index2: Word_t, err: PJError_t) -> Word_t;

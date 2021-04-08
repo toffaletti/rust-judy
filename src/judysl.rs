@@ -1,3 +1,5 @@
+#![allow(clippy::upper_case_acronyms)]
+
 use super::capi::*;
 use std::ffi::CStr;
 use std::ffi::CString;
@@ -5,6 +7,12 @@ use std::ptr::null_mut;
 
 pub struct JudySL {
     m: Pvoid_t,
+}
+
+impl Default for JudySL {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl JudySL {
@@ -16,9 +24,7 @@ impl JudySL {
         unsafe {
             let ks = CString::from_vec_unchecked(key.into());
             let v = JudySLIns(&mut self.m, ks.as_ptr() as *const u8, null_mut());
-            if v == null_mut() {
-                false
-            } else if *v != null_mut() {
+            if v.is_null() || !(*v).is_null() {
                 false
             } else {
                 *v = value as Pvoid_t;
@@ -31,7 +37,7 @@ impl JudySL {
         unsafe {
             let ks = CString::from_vec_unchecked(key.into());
             let v = JudySLGet(self.m, ks.as_ptr() as *const u8);
-            if v == null_mut() {
+            if v.is_null() {
                 None
             } else {
                 Some(*v as Word_t)
@@ -47,16 +53,16 @@ impl JudySL {
     }
 
     pub fn free(&mut self) -> Word_t {
-        if self.m != null_mut() {
+        if !self.m.is_null() {
             let ret = unsafe { JudySLFreeArray(&mut self.m, null_mut()) };
-            assert!(self.m == null_mut());
+            assert!(self.m.is_null());
             ret
         } else {
             0
         }
     }
 
-    pub fn iter<'a>(&'a self) -> JudySLIterator<'a> {
+    pub fn iter(&self) -> JudySLIterator<'_> {
         JudySLIterator {
             sl: self,
             k: [0; 1024],
@@ -68,7 +74,7 @@ impl JudySL {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.m == null_mut()
+        self.m.is_null()
     }
 }
 
@@ -89,7 +95,7 @@ impl<'a> Iterator for JudySLIterator<'a> {
     fn next(&mut self) -> Option<(&'a CStr, Word_t)> {
         unsafe {
             let v = JudySLNext(self.sl.m, self.k.as_mut_ptr(), null_mut());
-            if v == null_mut() {
+            if v.is_null() {
                 None
             } else {
                 Some((CStr::from_ptr(self.k.as_ptr() as *const i8), *v as Word_t))

@@ -5,6 +5,12 @@ pub struct JudyL {
     m: Pvoid_t,
 }
 
+impl Default for JudyL {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl JudyL {
     pub fn new() -> JudyL {
         JudyL { m: null_mut() }
@@ -13,9 +19,7 @@ impl JudyL {
     pub fn insert(&mut self, index: Word_t, value: Word_t) -> bool {
         unsafe {
             let v = JudyLIns(&mut self.m, index, null_mut());
-            if v == null_mut() {
-                false
-            } else if *v != null_mut() {
+            if v.is_null() || !(*v).is_null() {
                 false
             } else {
                 *v = value as Pvoid_t;
@@ -24,10 +28,25 @@ impl JudyL {
         }
     }
 
+    /// Warning: This function requires the keys to be sorted in relation to data already in the array.
+    /// That means even if this set of keys is sorted, if it's out of sequence with the keys in
+    /// the array then the function will fail.
+    pub fn insert_bulk_sorted(&mut self, count: Word_t, keys: &[Word_t], vals: &[Word_t]) -> bool {
+        assert!(
+            keys.len() as u64 >= count && vals.len() as u64 >= count,
+            "JudyL::insert_bulk_sorted: Keys or values array shorter than count argument!"
+        );
+        unsafe {
+            let result =
+                JudyLInsArray(&mut self.m, count, keys.as_ptr(), vals.as_ptr(), null_mut());
+            result == 0 || result == 1
+        }
+    }
+
     pub fn get(&self, index: Word_t) -> Option<Word_t> {
         unsafe {
             let v = JudyLGet(self.m, index, null_mut());
-            if v == null_mut() {
+            if v.is_null() {
                 None
             } else {
                 Some(*v as Word_t)
@@ -36,10 +55,10 @@ impl JudyL {
     }
 
     pub fn free(&mut self) -> Word_t {
-        if self.m != null_mut() {
+        if !self.m.is_null() {
             unsafe {
                 let ret = JudyLFreeArray(&mut self.m, null_mut());
-                assert!(self.m == null_mut());
+                assert!(self.m.is_null());
                 ret
             }
         } else {
@@ -47,7 +66,7 @@ impl JudyL {
         }
     }
 
-    pub fn iter<'a>(&'a self) -> JudyLIterator<'a> {
+    pub fn iter(&self) -> JudyLIterator<'_> {
         JudyLIterator { j: self, i: 0 }
     }
 
@@ -68,7 +87,7 @@ impl JudyL {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.m == null_mut()
+        self.m.is_null()
     }
 }
 
@@ -83,7 +102,7 @@ impl<'a> Iterator for JudyLIterator<'a> {
     fn next(&mut self) -> Option<(Word_t, Word_t)> {
         unsafe {
             let v = JudyLNext(self.j.m, &mut self.i, null_mut());
-            if v == null_mut() {
+            if v.is_null() {
                 None
             } else {
                 Some((self.i, *v as Word_t))
