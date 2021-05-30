@@ -45,7 +45,7 @@ impl Judy1 {
     }
 
     pub fn free(&mut self) -> Word_t {
-        if self.m.is_null() {
+        if !self.m.is_null() {
             unsafe {
                 let ret = Judy1FreeArray(&mut self.m, null_mut());
                 assert!(self.m.is_null());
